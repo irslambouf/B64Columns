@@ -55,7 +55,7 @@ public class Main {
 
                 for (int i=0; i< indexes.size(); i++){
                     if (i==0){
-                        fos.write(Base64.getEncoder().encode(uLine.getBytesOfRange(0, indexes.get(i))));
+                        fos.write(Base64.getEncoder().encode(uLine.getBytesOfRangeLower(0, indexes.get(i))));
                     }else {
                         fos.write(Base64.getEncoder().encode(uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i))));
                     }

@@ -377,6 +377,20 @@ public class UtilBytes {
         }
     }
 
+    public byte[] getBytesOfRangeLower(int start, int end){
+        if (start >= 0 && end <= data.length) {
+            byte[] original = Arrays.copyOfRange(data, start, end);
+            for (int i=0; i<original.length; i++){
+                if ((int) original[i] >= 65 && (int) original[i] <= 90 ){
+                    original[i] = (byte) (original[i] + 0x20);
+                }
+            }
+            return original;
+        } else {
+            return null;
+        }
+    }
+
     public byte[] getBytesOfRangeWithEndNewline(int start, int end) {
         if (start >= 0 && end <= data.length) {
             byte[] dataOfRangeWithNewLine = new byte[end - start + 1];
