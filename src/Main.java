@@ -46,7 +46,7 @@ public class Main {
         try {
             FileOutputStream fos = new FileOutputStream(out);
             FileAndFolderReaderBinaryV2 reader = new FileAndFolderReaderBinaryV2(args[1]);
-
+            Base64.Encoder encoder = Base64.getEncoder();
             byte[] line;
             while ((line = reader.readLine()) != null){
                 UtilBytes uLine = new UtilBytes(line);
@@ -55,14 +55,30 @@ public class Main {
 
                 for (int i=0; i< indexes.size(); i++){
                     if (i==0){
-                        fos.write(Base64.getEncoder().encode(uLine.getBytesOfRangeLower(0, indexes.get(i))));
+                        byte[] email = uLine.getBytesOfRangeLower(0, indexes.get(i));
+
+                        String sEmail = new String(email);
+
+                        int atIndex = sEmail.indexOf('@');
+
+                        fos.write(sEmail.substring(0, atIndex).getBytes());
+                        fos.write("\t".getBytes());
+                        fos.write(sEmail.substring(atIndex+1, sEmail.length()).getBytes());
+                        fos.write("\t".getBytes());
+
+                        fos.write(encoder.encode(email));
                     }else {
-                        fos.write(Base64.getEncoder().encode(uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i))));
+
+                        fos.write(encoder.encode(uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i))));
+
+
                     }
 
                     fos.write(delimiter);
                 }
-                fos.write(Base64.getEncoder().encode(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1)));
+                //fos.write(new String(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1)).getBytes());
+
+                fos.write(encoder.encode(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1)));
                 fos.write("\n".getBytes());
                 fos.flush();
             }
