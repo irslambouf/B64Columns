@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.Base64;
+import java.util.Scanner;
 
-public class Main {
+public class MainNoEmail {
     public static void main(String[] args){
         long start = System.nanoTime();
         if (args.length < 3){
@@ -67,21 +67,11 @@ public class Main {
                     // Email & password
                     if (i==0 || i==1){
                         if (i ==0){
-                            UtilBytes uEmail = new UtilBytes(uLine.getBytesOfRangeLower(0, indexes.get(i)));
-
-                            int atIndex = uEmail.findNextIndex(0, "@".getBytes());
-
-                            fos.write(new String(uEmail.getBytesOfRange(0, atIndex)).getBytes());                      // local part
-                            fos.write("\t".getBytes());
-
-                            fos.write(new String(uEmail.getBytesOfRange(atIndex+1, uEmail.size())).getBytes());        // domain part
-                            fos.write("\t".getBytes());
-
-                            fos.write(encoder.encode(uEmail.getData()));                        // B64 email
+                            fos.write(encoder.encode(uLine.getBytesOfRangeLower(0, indexes.get(i))));                        // B64 email
                             fos.write("\t".getBytes());
 
                             if (sha256 != null){
-                                fos.write(bytesToHex(sha256.digest(uEmail.getData())).getBytes());  // sha256
+                                fos.write(bytesToHex(sha256.digest(uLine.getBytesOfRangeLower(0, indexes.get(i)))).getBytes());  // sha256
                             }
                         }
 
@@ -96,14 +86,8 @@ public class Main {
                             }
                         }
                     }else {
-                        byte[] username = uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i));
                         //fos.write(uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i)));
-                        fos.write(encoder.encode(username));
-                        fos.write("\t".getBytes());
-
-                        if(sha256 != null && username.length != 0){
-                            fos.write(bytesToHex(sha256.digest(username)).getBytes());
-                        }
+                        fos.write(encoder.encode(uLine.getBytesOfRange(indexes.get(i-1)+delimiter.length, indexes.get(i))));
                     }
 
                     fos.write(delimiter);
@@ -113,14 +97,11 @@ public class Main {
                     fos.write(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1));   // only hash
                 }else {
                     fos.write(encoder.encode(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1)));
-
                     fos.write("\t".getBytes());
-
                     if(sha256 != null){
                         fos.write(bytesToHex(sha256.digest(uLine.getBytesOfRange(indexes.get(indexes.size()-1)+delimiter.length, uLine.size()-1))).getBytes());
                     }
                 }
-
 
                 fos.write("\n".getBytes());
                 fos.flush();
